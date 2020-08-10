@@ -1,10 +1,12 @@
 package com.example.demo;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.lang.Integer.parseInt;
+import static java.util.stream.Stream.of;
 
 /**
  * @author Jasper Wu
@@ -12,15 +14,19 @@ import static java.lang.Integer.parseInt;
  **/
 public class Calculator {
     public int calculate(String expression) {
-        String[] nums = expression.split("[^\\d]+");
-        String[] operations = expression.split("\\s?\\d+\\s?");
-        List<String> ops = Stream.of(operations).filter(str -> str != null && str.length() > 0).collect(Collectors.toList());
-        if ("+".equals(ops.get(0))) {
-            return parseInt(nums[0]) + parseInt(nums[1]);
+        String[] nums = expression.split("\\s[+-]\\s");
+        List<String> ops = of(expression.split("\\s?-?\\d+\\s?"))
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toList());
+        int result = parseInt(nums[0]);
+        for (int i = 0; i < ops.size(); i++) {
+            if ("+".equals(ops.get(i))) {
+                result += parseInt(nums[i+1]);
+            }
+            if ("-".equals(ops.get(i))) {
+                result -= parseInt(nums[i+1]);
+            }
         }
-        if ("-".equals(ops.get(0))) {
-            return parseInt(nums[0]) - parseInt(nums[1]);
-        }
-        return 0;
+        return result;
     }
 }
