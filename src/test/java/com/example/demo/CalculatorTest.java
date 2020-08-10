@@ -24,4 +24,14 @@ class CalculatorTest {
         // then
         assertThat(result).isEqualTo(3);
     }
+
+    @Test
+    public void should_return_integer_minus_1_when_calculate_given_expression_1_subtract_2() {
+        // given
+        String expression = "1 - 2";
+        // when
+        int result = calculator.calculate(expression);
+        // then
+        assertThat(result).isEqualTo(-1);
+    }
 }
