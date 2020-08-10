@@ -44,5 +44,14 @@ class CalculatorTest {
         // then
         assertThat(result).isEqualTo(-2);
     }
-
+    
+    @Test
+    public void should_return_integer_7_when_calculate_given_expression_1_subtract_2_plus_minus_1_multi_minus_8() {
+        // given
+        String expression = "1 - 2 + -1 * -8";
+        // when
+        int result = calculator.calculate(expression);
+        // then
+        assertThat(result).isEqualTo(7);
+    }
 }
