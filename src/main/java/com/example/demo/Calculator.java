@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
 
 /**
@@ -17,14 +18,14 @@ public class Calculator {
         String[] nums = expression.split("\\s[+-]\\s");
         List<String> ops = of(expression.split("\\s?-?\\d+\\s?"))
                 .filter(StringUtils::isNotBlank)
-                .collect(Collectors.toList());
+                .collect(toList());
         int result = parseInt(nums[0]);
         for (int i = 0; i < ops.size(); i++) {
             if ("+".equals(ops.get(i))) {
-                result += parseInt(nums[i+1]);
+                result += parseInt(nums[i + 1]);
             }
             if ("-".equals(ops.get(i))) {
-                result -= parseInt(nums[i+1]);
+                result -= parseInt(nums[i + 1]);
             }
         }
         return result;
