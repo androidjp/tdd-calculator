@@ -1,14 +1,10 @@
 package com.example.demo;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static java.lang.Integer.parseInt;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
 import static org.apache.commons.lang3.ArrayUtils.remove;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -29,10 +25,31 @@ public class Calculator {
         priorityMap.put("*", 1);
     }
 
+    private final Map<String, Consumer<Stack<Integer>>> calculateOperation;
+
+    {
+        calculateOperation = new HashMap<>(8);
+        calculateOperation.put("+", stack -> {
+            int b = stack.pop();
+            int a = stack.pop();
+            stack.add(a + b);
+        });
+        calculateOperation.put("-", stack -> {
+            int b = stack.pop();
+            int a = stack.pop();
+            stack.add(a - b);
+        });
+        calculateOperation.put("*", stack -> {
+            int b = stack.pop();
+            int a = stack.pop();
+            stack.add(a * b);
+        });
+    }
+
     public int calculate(String expression) {
         String[] nums = expression.split(SPLIT_FOR_NUMBER);
         String[] ops = getOperations(expression);
-        List<String> postRetrieveList = changeToPostRetrieve(nums, ops);
+        List<String> postRetrieveList = changeToPostOrderTraversal(nums, ops);
         return calculate(postRetrieveList);
     }
 
@@ -47,7 +64,7 @@ public class Calculator {
         return ops;
     }
 
-    private List<String> changeToPostRetrieve(String[] nums, String[] ops) {
+    private List<String> changeToPostOrderTraversal(String[] nums, String[] ops) {
         Stack<String> myStack = new Stack<>();
         List<String> list = new ArrayList<>(nums.length + ops.length);
         for (int i = 0; i < nums.length; i++) {
@@ -71,14 +88,7 @@ public class Calculator {
             if (obj.matches("-?\\d+")) {
                 stack.add(parseInt(obj));
             } else {
-                int b = stack.pop();
-                int a = stack.pop();
-                if ("+".equals(obj))
-                    stack.add(a + b);
-                if ("-".equals(obj))
-                    stack.add(a - b);
-                if ("*".equals(obj))
-                    stack.add(a * b);
+                calculateOperation.get(obj).accept(stack);
             }
         }
         return stack.get(0);
