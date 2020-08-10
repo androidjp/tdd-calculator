@@ -4,8 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.Integer.parseInt;
@@ -31,44 +30,37 @@ public class Calculator {
     }
 
     private List<String> changeToPostRetrieve(String[] nums, String[] ops) {
-        List<String> myStack = new ArrayList<>(nums.length + ops.length);
+        Map<String, Integer> priorityMap = new HashMap<>(8);
+        priorityMap.put("+", 0);
+        priorityMap.put("-", 0);
+        priorityMap.put("*", 1);
+
+        Stack<String> myStack = new Stack<>();
         List<String> list = new ArrayList<>(nums.length + ops.length);
         int point = -1;
         for (int i = 0; i < nums.length; i++) {
             if (ops[i].length() != 0) {
-                while (!myStack.isEmpty() &&
-                        (
-                                (("+".equals(ops[i]) || "-".equals(ops[i])) && ("+".equals(myStack.get(myStack.size() - 1)) || "-".equals(myStack.get(myStack.size() - 1))))
-                                        ||
-                                        (("+".equals(ops[i]) || "-".equals(ops[i])) && ("*".equals(myStack.get(myStack.size() - 1))))
-                        )
-                ) {
-                    list.add(myStack.get(point));
-                    myStack.remove(point);
-                    point--;
+                while (!myStack.isEmpty() && priorityMap.get(ops[i]) <= priorityMap.get(myStack.peek())) {
+                    list.add(myStack.pop());
                 }
                 myStack.add(ops[i]);
-                point++;
             }
             list.add(nums[i]);
         }
         while (!myStack.isEmpty()) {
-            list.add(myStack.get(myStack.size() - 1));
-            myStack.remove(myStack.size() - 1);
+            list.add(myStack.pop());
         }
         return list;
     }
 
     private int calculate(List<String> postRetrieveList) {
-        final List<Integer> stack = new ArrayList<>();
+        final Stack<Integer> stack = new Stack<>();
         for (String obj : postRetrieveList) {
             if (obj.matches("-?\\d+")) {
                 stack.add(parseInt(obj));
             } else {
-                int b = stack.get(stack.size() - 1);
-                stack.remove(stack.size() - 1);
-                int a = stack.get(stack.size() - 1);
-                stack.remove(stack.size() - 1);
+                int b = stack.pop();
+                int a = stack.pop();
                 if (obj.equals("+"))
                     stack.add(a + b);
                 if (obj.equals("-"))
